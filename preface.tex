@@ -1,18 +1,7 @@
-% preface.tex
-% Include this file in your main document with \input{preface}
+En este trabajo de fin de grado se explorará la idea de aplicar técnicas sofisticadas de visión computacional en un ámbito tan común como es el deporte. En particular, se investigará la posibilidad de automatizar la edición de video de un partido de futbol grabado con una cámara de lente de pez (360 grados) desde la perspectiva del portero.
 
-\chapter*{Preface}
-\addcontentsline{toc}{chapter}{Preface}
+Se ha decidido particularizar en este caso debido a que el proceso de edicición de los más de 90 minutos que tiene un partido de futbol para un portero resulta muy tedioso pues este puede pasar la mayor parte del juego inactivo, teniendo solo unas pocas intervenciones clave que son dificiles de encontrar sin revisar todo el partido de forma manual.
 
-This work represents the culmination of [time period] of research and study in [field/subject area]. The primary objective of this [thesis/dissertation/book/report] is to [briefly state main purpose or research question].
+Se ha optado por una camara de 360 grados ya que permite capturar una buena parte del campo y dar suficiente información sobre el partido para permitir a los modelos entender que esta pasando en cada momento. Sin embargo, el uso de este tipo de cámaras presentan una serie de dificultades adicionales que incrementan la capacidad computacional requerida de los algoritmos empleados e impiden la extracción de información concluyente a través de modelos de vision computacional. La cámara utilizada en particular es el modelo ONE X2 de insta360.
 
-The research presented here [brief description of methodology or approach]. Throughout this investigation, I have sought to [main goals or contributions].
-
-This work would not have been possible without the support and guidance of numerous individuals. I am particularly grateful to [advisor/supervisor name] for their invaluable mentorship and insights throughout this project. I also wish to thank [other key contributors, committee members, colleagues, etc.] for their constructive feedback and encouragement.
-
-Special acknowledgment goes to [institution/organization/funding source] for providing the resources and environment necessary to conduct this research. The [library staff/technical support/research participants] deserve recognition for their assistance in [specific contributions].
-
-I am deeply indebted to my [family/friends/colleagues] for their unwavering support and patience during the [writing/research] process. Their encouragement has been instrumental in bringing this work to completion.
-
-Any errors or omissions in this work remain my sole responsibility. It is my hope that this research will contribute meaningfully to the field of [subject area] and provide a foundation for future investigations.
-\vspace{1cm}
+Por último, se ha desarrollado un pipeline para transformar los videos de 360 grados en videos ya editados de imagen plana con la relación de aspecto deseada. Esta transformación encapsula la conversión del formato propietario de insta360 a un formato público (mp4) la conversión de imágenes equirectangulares a multiples perspectivas, el procesamiento en paralelo de cada perspectiva para la detección de objetos y la creación de una perspectiva nueva para cada imagen equirectangular con la información más relevante.
