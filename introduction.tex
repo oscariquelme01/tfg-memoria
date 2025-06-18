@@ -6,18 +6,18 @@ análisis integrales hechos por profesionales del deporte.
 
 Sin embargo, esto no es cierto para el deportista recreacional que busca mejorar sus aptitudes, obtener feedback de calidad o simplemente verse realizando su ejercicio. Típiciamente vemos a estos deportistas recurrir a su teléfono para grabar su actividad o incluso utilizar una cámara dedicada para luego pasar horas editando sus vídeos a mano, algo en lo que por norma general no suelen estar muy versados.
 
-La aplicación práctica de estas técnicas de grabación manual presenta desafíos significativos que limitan su adopción. Los principales obstáculos incluyen el tiempo excesivo requerido para revisar, editar y recortar los momentos relevantes, así como las limitaciones del campo de visión que impiden capturar información contextual completa de las jugadas. Aunque existen casos de deportistas recreacionales que obtienen buenos resultados utilizando cámaras con lente de pez y edición manual intensiva, la inversión temporal requerida (múltiples horas por sesión) resulta insostenible para la mayoría de usuarios. Esta problemática evidencia la necesidad de desarrollar una solución tecnológica automatizada que replique con precisión el trabajo de edición manual, pero sin la inversión temporal asociada.
+La aplicación práctica de estas técnicas de grabación manual presenta desafíos significativos que limitan su adopción. Los principales obstáculos incluyen el tiempo excesivo requerido para revisar, editar y recortar los momentos relevantes, así como las limitaciones del campo de visión que impiden capturar información contextual completa de las jugadas. Aunque existen casos de deportistas recreacionales que obtienen buenos resultados utilizando cámaras con ojo de pez y edición manual intensiva, la inversión temporal requerida (múltiples horas por sesión) resulta insostenible para la mayoría de usuarios. Esta problemática evidencia la necesidad de desarrollar una solución tecnológica automatizada que replique con precisión el trabajo de edición manual, pero sin la inversión temporal asociada.
 
 Particularizando en mi caso personal, como portero recreacional de distintos equipos de futbol 11 en ligas locales, el proceso de grabar, editar, recortar y producir vídeos que sean de ayuda para identificar errores potenciales y aspectos a mejorar resulta inviable debido a la cantidad de horas requeridas de trabajo manual.
 
 Hoy en dia, gracias a los avances en visión computacional tanto a nivel de eficiencia como a nivel de resultados, se posibilita una solución plausible para aquel que busque grabarse practicando su deporte. A través de técnicas de detección de imágenes, edición de vídeo procedural y codificación de situaciones espécificas de un deporte, se pueden lograr resultados comparables a la edición manual sin necesidad de que el deportista tenga que hacer una inversión significativa de tiempo o dinero.
 
 \section[Objetivos]{Objetivos}
-El objetivo final del proyecto es desarrollar un sistema que permita al portero recreacional instalar una cámara de lente de pez en su portería. Lograr este objetivo puede servir como caso precedente para el estudio de la automatización de obtención de videos relevantes dentro del ambito deportivo casual.
+El objetivo final del proyecto es desarrollar un sistema que permita al portero recreacional instalar una cámara de 360 grados en su portería y, sin mayor inversión temporal que la producida por las restricciones computacionales del sistema, extraiga los momentos clave de su partido de forma completamente desatenida y automática y con un grado de precisión similar al que ofrecería la edición manual. Lograr este objetivo puede servir como caso precedente para el estudio de la automatización de obtención de videos relevantes dentro del ambito deportivo casual.
 
-Como caso particular, se trabajará con la camara ONE X2 de la compañia insta360. Esta dispone de un SDK privado al que podemos aplicar con fines académicos y comerciales. Es necesario utilizar dicho SDK puesto que la cámara graba en un formato propietario llamado \textit{.insv}. Para manejar los videos grabados utilizando librerías públicas, primero deberemos realizar la conversión a un formato público usando la librería de insta360.
+Sin embargo, debido a la complejidad del proyecto y las limitaciones temporales que induce un trabajo de fin de grado, habrán partes del sistema que no quedarán implementadas y que serán incluidas en la sección de trabajo futuro.
 
-Se tratará de trabajar en la medida de lo posible con imagenes planas puesto que los modelos públicos de visión computacional más usados están entrenados con imagenes planas. Es decir, si intentamos usar la proyección de una imagen esférica la distorsión sufrida en el borde inferior y superior de la imagen harán mas dificil la detección de objetos para dichos modelos.
+% Se tratará de trabajar en la medida de lo posible con imagenes planas puesto que los modelos públicos de visión computacional más usados están entrenados con imagenes planas. Es decir, si intentamos usar la proyección de una imagen esférica la distorsión sufrida en el borde inferior y superior de la imagen harán mas dificil la detección de objetos para dichos modelos.
 
 Con esto en mente, se definen los siguientes objetivos:
 
@@ -28,7 +28,6 @@ Con esto en mente, se definen los siguientes objetivos:
 	\item Categorizar los objetos detectados en cada una de las 6 perspectivas usando un modelo de deteccíon de clases previamente entrenado. Esta información recogida será utilizada como input del algoritmo desarrollado para calcular el siguiente frame del video resultado.
 	
 	\item Desarrollar un algoritmo sencillo que permitirá al programa tomar decisiones sobre a donde se debe enfocar el siguiente frame. Este algoritmo tendrá en cuenta la posición del portero, la distancia estimada, el angúlo del frame anterior para prevenir el efecto de flickering y la posición de la pelota entre otros factores.
-		
 	  
 \end{enumerate}
 

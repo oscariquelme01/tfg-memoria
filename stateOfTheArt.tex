@@ -1,18 +1,44 @@
-% preface.tex
-% Include this file in your main document with \input{preface}
+Dado que el problema a resolver en este trabajo es complejo, es necesario hacer un estudio sobre los distintos tópicos y dominios con los que se trabajará a lo largo del desarrollo para asegurar una toma de decisiones informada y correcta. En este cápitulo se revisan los distintos desarrollos, estudios y casos de éxito ya realizados relacionados con la edición de video procedural y la detección de objetos en imágenes de 360 grados.
 
-\chapter*{Preface}
-\addcontentsline{toc}{chapter}{Preface}
+\section[Dispositivos de grabación]{Dispositivos de grabación}
+Hoy en día existe una amplia gama de dispositivos de grabación con distintas capacidades que sirven distintos propositos. En el caso de la grabación y automatización de imágenes deportivas, se contemplan los siguientes tipos en función de la lente usada y el tipo de imagen capturada.
+\begin{description}
+	\item [Cámaras Estandar:] Este tipo de dispositivos cuentan con una sola lente rectilínea que no provoca ningún tipo de distorsión en las líneas rectas de la imagen. Son conocidas también como cámaras convencionales y suelen ofrecer un campo de visión limitado menor al del ojo humano.
+	\item [Cámaras de 360 grados:] Este tipo de cámaras suelen contar con dos lentes y son capaces de capturar toda una escena en una imagén esférica. La proyección de una imagen esférica se conoce como su transformación equirectangular. A continuación, se muestran dos imágenes mostrando la forma esférica y su correspondiente proyección equirectangular.
+		\image{}{}{assets/equirect_spherical_sample}
+\end{description}
 
-This work represents the culmination of [time period] of research and study in [field/subject area]. The primary objective of this [thesis/dissertation/book/report] is to [briefly state main purpose or research question].
+\section[Detección de objetos]{Modelos de detección de objetos}
+El objetivo de este trabajo no es desarrollar y entrenar una red neuronal para la detección de imagenes haciendo \textit{fine-tunning} para el caso de estudio pues esto requiere de un trabajo de etiquetado de imagenes y una creación de un dataset pulido con distintas imágenes de porteros en distintas posiciones, además de los correspondientes recursos computacionales. Por lo tanto, se debe escoger un modelo previamente entrenado con un dataset lo suficientemente grande que ofrezca precisión para la detección de personas y balones de futbol.
 
-The research presented here [brief description of methodology or approach]. Throughout this investigation, I have sought to [main goals or contributions].
+Existen una gran variedad de modelos que cumplen este criterio. Entre estos, destacaremos los dos modelos siguientes que son considerados como el estado del arte en visión computacional.
 
-This work would not have been possible without the support and guidance of numerous individuals. I am particularly grateful to [advisor/supervisor name] for their invaluable mentorship and insights throughout this project. I also wish to thank [other key contributors, committee members, colleagues, etc.] for their constructive feedback and encouragement.
+\begin{description}
+	\item[YOLO (You Only Look Once):] Desarrollado inicialmente por Joseph Redmon y posteriormente mantenido por la compañía Ultralytics, YOLO representa una familia de algoritmos de detección de objetos que han revolucionado el campo de la visión por computador. Los modelos YOLO suelen venir previamente entrenados con el dataset COCO (Common Objects in Context), que contiene más de 330,000 imágenes etiquetadas con 80 clases diferentes de objetos, ofreciendo resultados relativamente precisos a una velocidad excepcional que permite su uso en tiempo real.
+	
+	Su funcionamiento se basa en dividir la imagen de entrada en una cuadrícula de $S \times S$ \textit{grids} (típicamente 7×7, 13×13 o 19×19 dependiendo de la versión) y realizar una única pasada por una red neuronal convolucional profunda, la cual ejecuta simultáneamente la detección, clasificación y localización de objetos. Cada celda de la cuadrícula es responsable de predecir un número fijo de \textit{bounding boxes} (normalmente 2 o 3) junto con sus correspondientes puntuaciones de confianza y probabilidades de clase.
+	
+	Las principales ventajas de YOLO incluyen su velocidad de procesamiento (hasta 45 FPS en hardware estándar), su capacidad para detectar objetos de forma holística considerando el contexto global de la imagen, y su robustez ante variaciones en el fondo. Entre sus limitaciones se encuentran dificultades para detectar objetos muy pequeños o grupos densos de objetos, así como una menor precisión en comparación con métodos de dos etapas como R-CNN. Las versiones más recientes (YOLOv8, YOLOv9, YOLOv10) han mejorado significativamente tanto en precisión como en eficiencia computacional.
 
-Special acknowledgment goes to [institution/organization/funding source] for providing the resources and environment necessary to conduct this research. The [library staff/technical support/research participants] deserve recognition for their assistance in [specific contributions].
+	\item[SSD (Single Shot Detector):] Desarrollado por Wei Liu et al. en 2016, SSD representa un enfoque híbrido que combina la velocidad de los detectores de una sola pasada con la precisión de los métodos multi-escala. Los modelos SSD son similares a YOLO en cuanto a su funcionamiento básico, realizando detección y clasificación en una única pasada por la red neuronal, pero incorporan una diferencia arquitectónica fundamental que los distingue significativamente.
+	
+	La característica distintiva de SSD radica en su uso de mapas de características (\textit{feature maps}) de múltiples escalas extraídos de diferentes capas de la red neuronal convolucional. En lugar de realizar predicciones únicamente en la última capa como YOLO, SSD genera predicciones en varios niveles de resolución: capas tempranas con alta resolución espacial para detectar objetos pequeños, y capas profundas con baja resolución pero rica información semántica para objetos grandes. Típicamente utiliza 6 escalas diferentes con tamaños de \textit{grids} que van desde 38×38 hasta 1×1.
+	
+	Cada ubicación en los mapas de características predice múltiples \textit{bounding boxes} con diferentes relaciones de aspecto (\textit{aspect ratios}), permitiendo una mejor adaptación a objetos de formas variadas. El modelo utiliza \textit{default boxes} (similares a los \textit{anchor boxes}) con diferentes escalas y relaciones de aspecto predefinidas, mejorando la capacidad de detección en comparación con enfoques más simples.
+	
+	SSD logra un equilibrio óptimo entre velocidad (aproximadamente 59 FPS) y precisión (mAP de ~74\% en PASCAL VOC), superando a YOLO en precisión mientras mantiene velocidades competitivas. Sus principales ventajas incluyen mejor detección de objetos pequeños, mayor precisión general, y capacidad para manejar objetos de múltiples escalas. Como limitación, requiere más memoria y poder computacional que YOLO debido a sus múltiples escalas de predicción.
+\end{description}
 
-I am deeply indebted to my [family/friends/colleagues] for their unwavering support and patience during the [writing/research] process. Their encouragement has been instrumental in bringing this work to completion.
+\section[Edición de video procedural]{Edición de video procedural}
 
-Any errors or omissions in this work remain my sole responsibility. It is my hope that this research will contribute meaningfully to the field of [subject area] and provide a foundation for future investigations.
-\vspace{1cm}
+El estado del arte en edición procedural de videos deportivos ha evolucionado significativamente hacia sistemas multimodales que integran análisis de señales audiovisuales para la generación automática de contenido. Merler et al\cite{merler2019}. proponen un enfoque novedoso para la curación automática de momentos destacados deportivos, fusionando información audiovisual para crear sistemas de primera generación en el ámbito editorial, estableciendo las bases metodológicas para aplicaciones especializadas en deportes específicos.
+
+Por otro lado, existen casos de éxito en contextos más informales en los que ingenieros han logrado crear pipelines de automatización de edición de vídeo \cite{mediumVideoEditingPython} usando métodos parecidos al de Merler et al.
+
+En el contexto del fútbol, los avances en algoritmos de Deep Learning han revolucionado el monitoreo del rendimiento, donde la tecnología de visión computacional emerge como herramienta vital no invasiva para el análisis de rendimiento, ofreciendo oportunidades para mejorar la claridad, precisión e inteligencia en la observación de eventos deportivos. Específicamente para la perspectiva del portero, trabajos como el prototipo de portero inteligente \cite{prasetya2020} utilizando visión computacional demuestran la viabilidad de sistemas de seguimiento de color sincronizados con cálculos matemáticos para posicionamiento, aplicables al entrenamiento de futbolistas. Sin embargo, los casos de estudio que usan edición procedural aplicados al deportista recreacional son limitados puesto que la mayoría de trabajos se aplican a los profesionales y la elite del deporte.
+
+\section[Conclusiones]{Conclusiones del estado del arte}
+
+El análisis del estado del arte ha permitido identificar los principales avances y herramientas aplicables a la automatización de la edición de video deportivo y tomar una decisión informada previa al diseño sobre que tecnologías se usarán. Se ha observado que el uso de cámaras de 360 grados ofrece una solución eficaz para capturar la totalidad del entorno sin necesidad de múltiples dispositivos, lo cual resulta ideal para el jugador de futbol recreacional que tiene un campo muy amplio que capturar. También se ha observado que a pesar de que existen varios modelos de detección de imagenes usando visión computacional que resultarían viables de usar, el modelo de YOLO se ajusta mejor a las necesidades del proyecto.
+
+A pesar de estos avances, la mayoría de las soluciones existentes están orientadas a contextos profesionales o de élite, con escasa atención al deportista recreacional. Además, los enfoques de edición procedural suelen depender de infraestructura compleja o datasets personalizados no siempre accesibles. Frente a estas limitaciones, este trabajo propone una solución que integra tecnologías accesibles y eficientes para ofrecer un sistema automático de edición de momentos relevantes desde el punto de vista del portero, contribuyendo así a estrechar la brecha entre el uso recreativo y profesional de la visión por computador aplicada al deporte.

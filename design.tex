@@ -1,1 +1,57 @@
-\image{}{}{assets/design}
+\section[Decisiones de diseño]{Decisiones de diseño y tecnologías}
+Antes de comenzar con la implementación del proyecto, se deben de tomar una serie de decisiones de diseño sobre las distintas posibilidades estudiadas en el capítulo de Estudio del Arte.
+
+\subsection{Dispositivo de grabación}
+
+Para el caso de estudio de este trabajo, se ha optado por una cámara de 360 grados pues, aunque el resultado esperado es una sucesión de imagenes en perspectiva sin distorsión, este tipo de dispositivos permiten capturar toda la información alrededor del portero que más adelante permitirá tomar decisiones automáticas sobre que perspectiva debemos extraer para cada imagen.
+
+En particular particular, se trabajará con la camara ONE X2 de la compañia insta360. Esta es capaz de grabar a 60FPS en 5.7k a 360 grados y dispone de un SDK privado al que podemos aplicar con fines académicos y comerciales. Es necesario utilizar dicho SDK puesto que la cámara graba en un formato propietario llamado \textit{.insv}. Para manejar los videos grabados utilizando librerías públicas, primero deberemos realizar la conversión a un formato público usando la librería de insta360.
+
+También se ha adquirido un trípode para nivelar la cámara a la altura deseada y facilitar el trabajo de detección de imágenes a los modelos de visión computacional.
+
+Esta decisión viene con una serie de desventejas las cuales se resumen en un incremento notorio de capacidad compotacional requerida, una mayor complejidad a la hora de trabajar con el sistema de coordenadas equirectangular y una serie de desafios técnicos que se detallarán en el cápitulo de implementación.
+
+\subsection{Modelo de detección de objetos}
+
+Dentro de los modelos contemplados durante el estudio del arte, YOLO resulta ser la elección más apropiada por varias razones específicas. Primero, el portero representa típicamente un objeto de tamaño considerable en el campo de visión, minimizando la desventaja histórica de YOLO con objetos pequeños. Segundo, las cámaras de 360 grados generan grandes volúmenes de datos que necesitan procesamiento eficiente, y la arquitectura más simple de YOLO consume menos recursos computacionales que el enfoque multi-escala de SSD, reduciendo significativamente los tiempos de procesamiento del video. Tercero, para aplicaciones de tracking de un objeto específico como el portero, la consistencia en las detecciones y la eficiencia computacional son más importantes que la precisión absoluta de detección multi-clase.
+
+\subsection{Tecnologías y librerías}
+
+La decisión de que tecnologías y librerías escoger ha sido sencilla. La mayor parte del proyecto se desarrolla en python, dejando solo la parte de conversión de video de formato propietario a público en c++ porque el SDK de insta360 lo requiere.
+
+Las principales librerías de interés de python usadas son las siguientes.
+\begin{description}
+	\item[ultralytics:] librería oficial de la compañia de ultralytics para cargar y usar modelos como el de YOLO.
+	\item[numpy:] librería de funciones matemáticas para el trabajo de arrays multidimensionales pues está escrita en C y optimizada para un volumen de calculos matemáticos muy grande. Es el estandar de la industria y es de código abierto.
+	\item[cv2:] principal módulo de python de la librería de visión computacional más grande del mundo, openCV, con más de 2500 algoritmos y operada por la organización sin ánimo de lucro Open Source Vision Foundation.
+\end{description}
+
+
+\section[Arquitectura]{Arquitectura del sistema}
+El sistema se compone de dos actores principales encargados de leer y escribir los vídeos grabados por la cámara e importados de forma manual. El proceso de importación de video puede ser automatizado también pero se ha decidido que está fuera de alcance del proyecto y puede ser incluído como trabajo futuro para minimizar aún más el tiempo invertido por el deportista.
+\vspace{20px}
+
+\subsection{Conversor de videos (media\_conversor)}
+El primer actor del sistema será el conversor de vídeos de formato propietario a público. Se implementa en c++ porque el propio SDK de insta360 está implementado en esta tecnología. El programa se limita a tomar como input una pareja de videos guardada en \verb|sources/raw_footage| en formato \texit{.insv} debido a que la cámara graba en dos ficheros distintos cada video, uno por cada lente. Una vez seleccionado un vídeo, procederá a hacer las transformaciones pertinentes para guardar el video en formato \textit{.insv} en la carpeta de \verb|sources/converted_footage|  
+
+\subsection{Rastreador del portero (goalkeeper\_tracker)}
+El segundo actor es de mucho mayor interés y encapsula toda la funcionalidad de identificar al portero en un partido y asegurar que la imagen equirectangular se transforma en la perspectiva adecuada que muestra la información relevante de la jugada. Dentro de este actor se desarrollan distintos módulos como el de estimación de distancias de objetos detectados, el procesador de imagenes equirectangulares y el traductor de coordenadas entre esféricas, equirectangulares y carterisanas.
+
+
+\begin{figure}[pie de foto]{design}{Diagrama de la arquitectura del sistema}
+	\begin{center}
+		\image{}{}{assets/design}
+	\end{center}
+\end{figure}
+
+\section{Diseño del algoritmo}
+La parte más crítica del pipeline es el algoritmo que se emplea para decidir que perspectiva debemos producir a partir de una imagen equirectangular.
+
+Como se ha discutido previamente, no es buena idéa realizar la detección de imágenes sobre la propia imagen equirectangular usando un modelo entrenado con imagenes planas, por lo que el primer paso del algoritmo será transformar la imagen equirectangular en su mapa cubíco (cubeMap) lo cual significa obtener las 6 perspectivas planas (frontal, laterales, trasera...) que describen la información contenida en la imagen equirectangular eliminando la distorsión completamente.
+
+El segundo paso es procesar cada una de las perspectivas generadas a través del modelo de detección de visión computacional de YOLO. Esto genera una lista de objetos detectados, entre los cuales se filtra según nuestras clases de interés. Una vez obtenida una lista curada de detecciones se calcula la distancia estimada a cada objeto almacenando toda la información de interés hasta el momento.
+
+Acto seguido, se iterará sobre la lista obtenida, seleccionando a la persona más cercanaa la cámara y triangulando entre el balón (en caso de haber sido detectado) y el portero o simplemente ajustando la vista al portero.
+
+Finalmente, se realizan las traducciones necesarias de las coordenadas cartesianas obtenidas a las coordenadas equirectangulares y se crea la nueva perspectiva que describe una vista adecuada para la jugada, escribiendola en el video resultante.
+
