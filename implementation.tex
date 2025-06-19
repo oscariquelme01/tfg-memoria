@@ -166,7 +166,23 @@ Por último, cabe destacar que las dos únicas clases tenidas en cuenta dentro d
 \subsection{Algoritmo de rastreo de portero}
 Finalmente, con toda la información obtenida hasta ahora de las distintas perspectivas, se desarrolla el algoritmo de rastreo del portero, usando suposiciones básicas como la de que el portero probablemente sea el jugador más cercano a la porteria la mayor parte del tiempo, técnicas de suavizado de vídeo como la interpolación y triangulación entre la posición de la pelota y el portero para mostrar mejor información en el resultado final.
 
-En primer lugar, el algoritmo separa las detecciones de personas y pelotas obtenidas. Normalmente solo se va a detectar una pelota pero puede suceder que el balón se encuentre entre dos perspectivas de la proyección de cubeMap o se de un falso positivo debido al tamaño del modelo de YOLO usado.
+En primer lugar, el algoritmo separa las detecciones de personas y pelotas obtenidas. Normalmente solo se va a detectar una pelota pero puede suceder que el balón se encuentre entre dos perspectivas de la proyección de cubeMap o se de un falso positivo debido al tamaño del modelo de YOLO usado. 
 
 Acto seguido, realiza una selección simple usando un sistema de pesos basado en la confianza y la distancia del objeto detectado, con un sesgo de 0.9 a favor de la distancia. Este es un ejemplo del tipo de normas y situaciones espécificas codificadas que permiten mejores resultados particularizando en un deporte.
 
+Luego, se calcula el yaw y pitch base que apuntan directamente al portero. Estos primeros pasos asi como la cabecera del algoritmo vienen dados en el segmento de código \ref{Algorithm}
+
+\PythonCode[Algorithm]{Algorithm}{Detección ingénua del portero en base a los resultados de YOLO}{Algorithm.py}{0}{35}{}
+
+Con estos pasos realizados, se tiene ya una buena aproximación del frame que se debe generar para mostrar en el video final la jugada. Sin embargo, no se tiene en cuenta el posible efecto flickering causado por un falso positivo de un jugador que no sea el portero acercandose a la cámara ni se tiene en cuenta la posición del balón para mostrar, por ejemplo, el inicio de un tiro.
+
+Por lo tanto, el siguiente paso será incorporar la información del balón recogida en la fase de detección si es que está disponible y realizar un sesgo del ángulo en favor del balón. Se ha decidido aplicar un sistema de pesos en función de la distancia del balón con condiciones que modifican de forma dínamica el peso de las coordenadas de la pelota.
+
+
+\PythonCode[Algorithm2]{Algorithm2}{Incorporación de la bola en el algoritmo de rastreo}{Algorithm.py}{37}{61}{}
+
+Finalmente, para resolver el problema del flickering previamente mencionado. Este problema se da en el caso de este trabajo cuando hay una diferencia considerable entre la predicción del algoritmo del frame $n$ y el frame previo $n-1$. El efecto resultante es una falta de cohesión en el video y en función del número de frames puede llegar a darse un parpadeo rápido que afecta gravemente a la calidad del video resultante. 
+
+Se ha decidido aplicar técnicas básicas de suavizado de vídeo para prevenir el flickering. Primero, el algoritmo se asegura de que el salto de un frame a otro no es mayor que el umbral definido por argumentos. Luego, el algoritmo aplica una media movil exponencial (EMA) para suavizar el yaw y pitch previamente limitados.
+
+\PythonCode[Algorithm3]{Algorithm3}{Aplicación de técnicas de suavizado de vídeo}{Algorithm.py}{63}{92}{}

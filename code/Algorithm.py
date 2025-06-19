@@ -2,27 +2,6 @@ def get_goalkeeper_view(all_detections, previous_yaw=None, previous_pitch=None,
                        frame=None, perspective_width=1920, perspective_height=1080,
                        camera_yaw=0, camera_pitch=0, camera_fov=90,
                        smoothing_factor=0.7, max_yaw_change=15, max_pitch_change=10):
-    """
-    Enhanced goalkeeper view detection with video smoothing and ball awareness.
-    
-    Args:
-        all_detections: List of detection objects with keys: 'class', 'conf', 'distance', 'bbox'
-        previous_yaw: Previous frame's yaw angle for smoothing
-        previous_pitch: Previous frame's pitch angle for smoothing  
-        frame: Current video frame for remapping
-        perspective_width: Width of the perspective view
-        perspective_height: Height of the perspective view
-        camera_yaw: Current camera yaw angle
-        camera_pitch: Current camera pitch angle
-        camera_fov: Camera field of view
-        smoothing_factor: How much to smooth (0=no smoothing, 1=maximum smoothing)
-        max_yaw_change: Maximum allowed yaw change per frame
-        max_pitch_change: Maximum allowed pitch change per frame
-    
-    Returns:
-        dict: {'detection': best_detection, 'yaw': target_yaw, 'pitch': target_pitch, 'frame': remapped_frame}
-    """
-    
     if not len(all_detections):
         return None
     
