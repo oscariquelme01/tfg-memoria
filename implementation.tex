@@ -146,9 +146,27 @@ Usando todo el proceso descrito para extraer vistas de una imagen equirectangula
 
 Se puede intuir que este proceso es muy costoso por lo que una optimización evidente será precomputar las tablas de busqueda $(u_f, v_f)$, permitiendo un remapeo eficiente en tiempo real usando la función \verb|cv2.remap()| de OpenCV con interpolación bilineal y condiciones de contorno cíclicas.
 
-En el extracto de código \ref{precompute_mapping_tables} se muestra la implementación del precomputo de las tables de mapeo usando el algoritmo descrito en el apartado anterior.
+En el extracto de código \ref{precomputeMappingTables} se muestra la implementación del precomputo de las tables de mapeo usando el algoritmo descrito en el apartado anterior.
 
-\PythonCode[precompute_mapping_tables]{File picking}{Precomputación de tablas para un mapeo mas eficiente de las vistas de CubeMap}{EquirectProcessor.py}{29}{71}{}
+\PythonCode[precomputeMappingTables]{precomputeMappingTables}{Precomputación de tablas para un mapeo mas eficiente de las vistas de CubeMap}{EquirectProcessor.py}{29}{71}{}
 
+\subsection{Detección de imágenes usando YOLO}
+Una vez calculadas todas las perspectivas, se procede a la detección de imágenes usando el modelo de YOLO v8. Ultralytics ofrece una serie de tamaños dentro de cada versión de YOLO. Por limitaciones computacionales, se ha elegido el tamaño nano, el cual ofrece los peores resultados a cambio de los mejores tiempos. Esta es una decisión adecuada pues el trabajo esta orientada al deportista recreacional que no dispone de computación de altas prestaciones.
 
+La librería de ultralytics facilita una clase que permite cargar un modelo, en este caso \verb|yolov8n.pt|, con toda la funcionalidad necesaria para procesar un frame y obtener una serie de resultados describiendo las detecciones encontradas. Por lo tanto, no se entra en mucho detalle de implementación en esta sección.
+
+Sin embargo, si merece la pena mencionar el algoritmo empleado de estimación de distancia de objetos el cual a pesar de no ser completamente fiable, si dio buenos resultados en la práctica. En la figura \ref{objectDistance} se muestra el codigo que implementa la estimación de la distancia de un objeto usando el modelo de cámara estenopeica, el cual se basa en la longitud focal
+
+\PythonCode[objectDistance]{objectDistance}{Implementación de la distancia de objetos basada en cámaras estenopeicas}{object-distance.py}{0}{37}{}
+
+Esta distancia calculada se usará más adelante como variable dentro del algoritmo de detección y rastreo del portero.
+
+Por último, cabe destacar que las dos únicas clases tenidas en cuenta dentro de las 80 clases detectadas por YOLO son la número 0 y la 32, las cuales hacen referencia a personas y pelotas de deportes respectivamente.
+
+\subsection{Algoritmo de rastreo de portero}
+Finalmente, con toda la información obtenida hasta ahora de las distintas perspectivas, se desarrolla el algoritmo de rastreo del portero, usando suposiciones básicas como la de que el portero probablemente sea el jugador más cercano a la porteria la mayor parte del tiempo, técnicas de suavizado de vídeo como la interpolación y triangulación entre la posición de la pelota y el portero para mostrar mejor información en el resultado final.
+
+En primer lugar, el algoritmo separa las detecciones de personas y pelotas obtenidas. Normalmente solo se va a detectar una pelota pero puede suceder que el balón se encuentre entre dos perspectivas de la proyección de cubeMap o se de un falso positivo debido al tamaño del modelo de YOLO usado.
+
+Acto seguido, realiza una selección simple usando un sistema de pesos basado en la confianza y la distancia del objeto detectado, con un sesgo de 0.9 a favor de la distancia. Este es un ejemplo del tipo de normas y situaciones espécificas codificadas que permiten mejores resultados particularizando en un deporte.
 
