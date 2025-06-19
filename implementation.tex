@@ -1,0 +1,154 @@
+En este capítulo se entra en detalle sobre la implementación de los distintos componentes del sistema asi como las dificultades encontradas, la matemática detrás de las transformaciones y la complejidad computacional del algoritmo. Finalmente, se reflexiona sobre las decisiones tomadas y la correctitud de las mismas.
+
+\section{Conversor de vídeos (media\_conversor)}
+
+En primer lugar, se debe implementar el programa que convertirá los videos del formato propietario de insta360 a un formato público manteniendo las propiedades esféricas del vídeo.
+
+Antes de desarrollar, se debe de tener acceso al SDK de insta360, al cual se aplica con razones acádemicas en este caso. El proceso de aprobación se extendió una semana y una vez obtenido, la implementación del conversor de videos fue muy sencilla pues el ejemplo de uso propuesto por la compañia es muy similar a la funcionalidad requerida para el proyecto. No se puede entrar muy en detalle de la implementación pues la mayor parte del trabajo la realiza la clase \verb|VideoStitcher| del SDK privado de insta360. Sin embargo, cabe mencionar que el programa viene con soporte de optimizaciones de GPU y paralelización de hilos.
+
+El único desarrollo destacable es el proceso de elección de videos dínamico por el usuario pues a traves de una aplicación de CLI puesto que al tener dos lentes y un video asociado a cada lente, es poco práctico tener que escribir manualmente los \textit{paths} de entrada y salida del programa. A través del uso de Regex.
+
+\CPPCode[picking_files_cpp]{File picking}{Automatización de I/O según la convención de insta360}{main.cc}{52}{86}{}
+
+\vspace{60px}
+
+\section{Rastreador del portero (goalkeeper\_tracker)}
+
+Una vez obtenido el video en un formato con el que se puede trabajar con la librería de openCV, se procede a la implementación del principal objetivo del trabajo, la automatización de edición de jugadas de portero de futbol.
+
+Los pasos a seguir por el programa, independientemente de su implementación son los siguientes.
+\begin{enumerate}
+	\item Elegir el vídeo de input en formato equirectangular y ya convertido a .mp4
+	\item Iterar por cada frame que compone el video
+	\item Convertir el frame equirectangular en su proyección de cubemap (6 perspectivas)
+	\item Pasar cada una de las 6 perspectivas por el modelo de detección de objetos y  guardar los resultados de interes en una lista
+	\item Usar la información de la lista para determinar la nueva perspectiva con la información relevante
+	\item Crear la nueva perspectiva y escribirla en el vídeo resultante
+
+\end{enumerate}
+
+\subsection{Conceptos previos}
+La proyección de una imagen esférica sobre una superficie plana se conoce como su imágen equirectangular. El trabajo con imágenes esféricas y equirectangulares introduce una serie de dificultades frente al de imagenes planas. Antes de detallar la implementación, hace falta explicar una serie de conceptos asociados a las coordenadas de imágenes esféricas, equirectangulares y cartesianas y la conversión entre las mismas. En la figura \ref{equirectCoordsSpherical} se aprecia una representación semántica de las coordenadas equirectangulares en una imagen omnidireccional. Las coordenadas que indexan una imágen equirectangular vienen dadas por las letras $(\theta, \phi)$.
+
+\begin{figure}[equirectCoordsSpherical]{equirectCoordsSpherical}{Representación de coordenadas equirectangulares en una figura esférica}
+	\begin{center}
+		\image{180px}{}{assets/omnidirectionalImage}
+	\end{center}
+\end{figure}
+
+\begin{description}
+	\item[$\theta$] Indexa el eje horizontal y toma valores entre $[-\pi, \pi]$ (360 grados). Puede pensarse como la dirección horizontal en la que está mirando la cámara. Viene dado en radianes y en caso de estar dado en grados se conoce como \textit{yaw}
+	\item[$\phi$] Indexa el eje vertical y toma valores entre $[-\frac{\pi}{2}, \frac{\pi}{2}]$ (180 grados). Puede pensarse como de arriba o abajo esta apuntando la cámara. Viene dado en radianes y en caso de estar dado en grados se como como \textit{pitch}
+\end{description}
+
+Una vez proyectada la imágen esférica sobre una superficie plana se obtiene una imagen como la mostrada en la figura \ref{equirectCoordsPlain}, donde se ve claramente la forma en la que se indexa a través de $\theta, \phi$ (o yaw y pitch en grados) la imagen.
+
+
+\begin{figure}[equirectCoordsPlain]{equirectCoordsPlain}{Representación de coordenadas equirectangulares en una sueprficie plana}
+	\begin{center}
+		\image{300px}{}{assets/equirectCoordinates}
+	\end{center}
+\end{figure}
+
+De esta forma, resulta muy sencillo conceptualmente 'desplegar' la proyección equirectangular en una vista conocida como CubeMap, la cual representa las 6 vistas principales posibles en un espacio tridimensional. Se puede pensar como envolver la vista esférica en un cubo donde cada cara tendrá una perspectiva plana sin información duplicada del resto. La figura \ref{cubemapConcept} muestra una representación gráfica de este concepto.
+
+\begin{figure}[cubemapConcept]{cubemapConcept}{Representación visual de la vista Cubemap a partir de una imagen esférica}
+	\begin{center}
+		\image{300px}{}{assets/cubemapConcept}
+	\end{center}
+\end{figure}
+
+\subsection{Transformación de imágenes equirectangulares a planas}
+Como ya se ha discutido previamente, el modelo de visión computacional empleado está entrenado con imágenes sin distorsión por lo que ofrecerá mejores resultados si las imagenes procesadas son perspectivas generadas a partir de la imagen equirectangular.
+
+Para crear una imagen sin distorsión a partir de una imagen equirectangular, se requiere de una coordenada que indexe el punto central de la perspectiva y el tamaño del resultado deseado. 
+El proceso de transformación de imágenes es costoso y complejo, y su fundamento matemático se encuentra en la trigonometría avanzada y las transformaciones matriciales.
+
+Dada una imagen de salida en perspectiva de resolución $(W, H)$ y campo de visión $\text{FOV}$, primero establecemos un sistema de coordenadas de imagen normalizado:
+$x = \frac{2u}{W-1} - 1, \quad y = \frac{2v}{H-1} - 1$
+donde $(u, v)$ son coordenadas de píxel con $u \in [0, W-1]$ y $v \in [0, H-1]$.
+La proyección en perspectiva mapea estas coordenadas 2D a rayos 3D sobre la esfera unitaria. La distancia focal en coordenadas normalizadas es:
+$z = \frac{1}{\tan(\text{FOV}/2)}$.
+Cada píxel $(x, y)$ corresponde a un vector de dirección 3D:
+$\mathbf{d} = (x, y, z)$
+Este vector se normaliza para situarse en la esfera unitaria:
+$\mathbf{d}_{\text{norm}} = \frac{\mathbf{d}}{||\mathbf{d}||} = \frac{(x, y, z)}{\sqrt{x^2 + y^2 + z^2}}$
+
+La dirección de visualización se controla mediante rotaciones de pitch ($\phi$) y yaw ($\theta$). Estas se aplican usando matrices de rotación 3D:
+
+Rotación de pitch (rotación alrededor del eje Y):
+
+$$R_{\text{yaw}}(\phi) = \begin{pmatrix}
+\cos(\phi) & 0 & \sin(\phi) \\
+0 & 1 & 0 \\
+-\sin(\phi) & 0 & \cos(\phi)
+\end{pmatrix}$$
+
+\\
+Rotación de yaw (rotación alrededor del eje X):
+
+$$R_{\text{pitch}}(\theta) = \begin{pmatrix}
+1 & 0 & 0 \\
+0 & \cos(\theta) & -\sin(\theta) \\
+0 & \sin(\theta) & \cos(\theta)
+\end{pmatrix}$$
+
+La matriz de rotación combinada es:
+$R = R_{\text{yaw}}(\phi) \cdot R_{\text{pitch}}(\theta)$
+
+Por lo tanto, el vector de dirección rotado se convierte en:
+$\mathbf{d}_{\text{rot}} = R \cdot \mathbf{d}_{\text{norm}}$
+
+
+El vector de dirección 3D rotado $(x', y', z')$ se convierte a coordenadas esféricas, calculando la longitud (ángulo azimutal) y la latitud (ángulo polar):
+
+
+$$
+\begin{align}
+\phi &= \arctan2(x', z')\\
+\lambda &= \arcsin(y')
+\end{align}
+$$
+Donde $\phi \in [-\pi, \pi]$ y $\lambda \in [-\pi/2, \pi/2]$
+
+Finalmente, las coordenadas esféricas se mapean a coordenadas de píxel en la imagen equirectangular de dimensiones $(W_{\text{equi}}, H_{\text{equi}})$:
+
+Coordenada horizontal:
+$u_{\text{equi}} = \left(\frac{\phi}{\pi} + 1\right) \cdot \frac{W_{\text{equi}}}{2}$
+
+Coordenada vertical:
+$v_{\text{equi}} = \left(\frac{1}{2} - \frac{\lambda}{\pi}\right) \cdot H_{\text{equi}}$
+
+La transformación completa puede expresarse como la composición:
+$\text{Perspectiva}(u,v) \rightarrow \text{Normalizada}(x,y,z) \rightarrow \text{Esfera}(x',y',z') \rightarrow \text{Esférica}(\phi,\lambda) \rightarrow \text{Equirectangular}(u_{\text{equi}},v_{\text{equi}})$
+
+
+\subsection{Transformación de imágenes equirectangulares a Cubemap}
+
+Se definen las 6 perspectivas principales, en grados, con la tabla \ref{tablaVistas}
+
+\begin{table}{tablaVistas}{Equivalencia entre vistas de Cubemap y su Yaw y Pitch correspondiente}
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Vista} & \textbf{Yaw} & \textbf{Pitch} & \\
+		\midrule
+		Lateral derecha & 90° & 0° & \\
+		Trasera & 180° & 0° & \\
+		Lateral izquierda & -90° & 0° & \\
+		Frontal & 0° & 0° & \\
+		Inferior & 0° & -90° & \\
+		Superior & 0° & 90° & \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Usando todo el proceso descrito para extraer vistas de una imagen equirectangular, generamos para cada frame las 6 perspectivas principales para posteriormente procesarlas con un modelo de detección de objetos.
+
+Se puede intuir que este proceso es muy costoso por lo que una optimización evidente será precomputar las tablas de busqueda $(u_f, v_f)$, permitiendo un remapeo eficiente en tiempo real usando la función \verb|cv2.remap()| de OpenCV con interpolación bilineal y condiciones de contorno cíclicas.
+
+En el extracto de código \ref{precompute_mapping_tables} se muestra la implementación del precomputo de las tables de mapeo usando el algoritmo descrito en el apartado anterior.
+
+\PythonCode[precompute_mapping_tables]{File picking}{Precomputación de tablas para un mapeo mas eficiente de las vistas de CubeMap}{EquirectProcessor.py}{29}{71}{}
+
+
+

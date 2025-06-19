@@ -1,37 +1,35 @@
 Este capítulo inicial presenta una introducción general al trabajo, exponiendo los motivos que justifican su desarrollo, los objetivos propuestos y la organización del documento.
 
 \section[Motivación]{Motivación}
-En el ambito profesional del deporte, especialmente en la elite de aquellos tan populares como el futbol, los deportistas cuentan con herramientas tecnológicas sofisticadas que les ayudan a comprender sus debilidades y fortalezas. Normalmente disponen de vídeos y 
-análisis integrales hechos por profesionales del deporte.
+En el ámbito profesional del deporte, especialmente en la élite de aquellos tan populares como el fútbol, los deportistas cuentan con herramientas tecnológicas sofisticadas que les ayudan a comprender sus debilidades y fortalezas. Normalmente disponen de vídeos y análisis integrales hechos por profesionales del deporte.
 
-Sin embargo, esto no es cierto para el deportista recreacional que busca mejorar sus aptitudes, obtener feedback de calidad o simplemente verse realizando su ejercicio. Típiciamente vemos a estos deportistas recurrir a su teléfono para grabar su actividad o incluso utilizar una cámara dedicada para luego pasar horas editando sus vídeos a mano, algo en lo que por norma general no suelen estar muy versados.
+Sin embargo, esto no es cierto para el deportista recreacional que busca mejorar sus aptitudes, obtener feedback de calidad o simplemente verse realizando su ejercicio. Típicamente vemos a estos deportistas recurrir a su teléfono para grabar su actividad o incluso utilizar una cámara dedicada para luego pasar horas editando sus vídeos a mano, algo en lo que por norma general no suelen estar muy versados.
 
 La aplicación práctica de estas técnicas de grabación manual presenta desafíos significativos que limitan su adopción. Los principales obstáculos incluyen el tiempo excesivo requerido para revisar, editar y recortar los momentos relevantes, así como las limitaciones del campo de visión que impiden capturar información contextual completa de las jugadas. Aunque existen casos de deportistas recreacionales que obtienen buenos resultados utilizando cámaras con ojo de pez y edición manual intensiva, la inversión temporal requerida (múltiples horas por sesión) resulta insostenible para la mayoría de usuarios. Esta problemática evidencia la necesidad de desarrollar una solución tecnológica automatizada que replique con precisión el trabajo de edición manual, pero sin la inversión temporal asociada.
 
-Particularizando en mi caso personal, como portero recreacional de distintos equipos de futbol 11 en ligas locales, el proceso de grabar, editar, recortar y producir vídeos que sean de ayuda para identificar errores potenciales y aspectos a mejorar resulta inviable debido a la cantidad de horas requeridas de trabajo manual.
+Particularizando en mi caso personal, como portero recreacional de distintos equipos de fútbol 11 en ligas locales, el proceso de grabar, editar, recortar y producir vídeos que sean de ayuda para identificar errores potenciales y aspectos a mejorar resulta inviable debido a la cantidad de horas requeridas de trabajo manual.
 
-Hoy en dia, gracias a los avances en visión computacional tanto a nivel de eficiencia como a nivel de resultados, se posibilita una solución plausible para aquel que busque grabarse practicando su deporte. A través de técnicas de detección de imágenes, edición de vídeo procedural y codificación de situaciones espécificas de un deporte, se pueden lograr resultados comparables a la edición manual sin necesidad de que el deportista tenga que hacer una inversión significativa de tiempo o dinero.
+Hoy en día, gracias a los avances en visión computacional tanto a nivel de eficiencia como a nivel de resultados, se posibilita una solución plausible para aquel que busque grabarse practicando su deporte. A través de técnicas de detección de imágenes, edición de vídeo procedural y codificación de situaciones específicas de un deporte, se pueden lograr resultados comparables a la edición manual sin necesidad de que el deportista tenga que hacer una inversión significativa de tiempo o dinero.
 
 \section[Objetivos]{Objetivos}
-El objetivo final del proyecto es desarrollar un sistema que permita al portero recreacional instalar una cámara de 360 grados en su portería y, sin mayor inversión temporal que la producida por las restricciones computacionales del sistema, extraiga los momentos clave de su partido de forma completamente desatenida y automática y con un grado de precisión similar al que ofrecería la edición manual. Lograr este objetivo puede servir como caso precedente para el estudio de la automatización de obtención de videos relevantes dentro del ambito deportivo casual.
+El objetivo final del proyecto es desarrollar un sistema que permita al portero recreacional instalar una cámara de 360 grados en su portería y, sin mayor inversión temporal que la producida por las restricciones computacionales del sistema, extraiga los momentos clave de su partido de forma completamente desatendida y automática y con un grado de precisión similar al que ofrecería la edición manual. Lograr este objetivo puede servir como caso precedente para el estudio de la automatización de obtención de vídeos relevantes dentro del ámbito deportivo casual.
 
-Sin embargo, debido a la complejidad del proyecto y las limitaciones temporales que induce un trabajo de fin de grado, habrán partes del sistema que no quedarán implementadas y que serán incluidas en la sección de trabajo futuro.
-
-% Se tratará de trabajar en la medida de lo posible con imagenes planas puesto que los modelos públicos de visión computacional más usados están entrenados con imagenes planas. Es decir, si intentamos usar la proyección de una imagen esférica la distorsión sufrida en el borde inferior y superior de la imagen harán mas dificil la detección de objetos para dichos modelos.
+Sin embargo, debido a la complejidad del proyecto y las limitaciones temporales que induce un trabajo de fin de grado, habrá partes del sistema que no quedarán implementadas y que serán incluidas en la sección de trabajo futuro.
 
 Con esto en mente, se definen los siguientes objetivos:
 
 \begin{enumerate}
-	\item Desarrollar un programa que permita convertir el video grabado a un formato público con el que podremos interactuar más adelante con librerías de video. El programa deberá asegurarse de mantener los metadatos necesarios y propiedades asociadas a un video de 360 grados.
+	\item Desarrollar un programa que permita convertir el vídeo grabado a un formato público con el que podremos interactuar más adelante con librerías de vídeo. El programa deberá asegurarse de mantener los metadatos necesarios y propiedades asociadas a un vídeo de 360 grados.
 
 	\item Implementar la funcionalidad que permita describir una imagen esférica como la combinación de las 6 perspectivas cúbicas usando trigonometría avanzada. Para ello, primero se deberá convertir la imagen de 360 grados a su proyección equirectangular.
-	\item Categorizar los objetos detectados en cada una de las 6 perspectivas usando un modelo de deteccíon de clases previamente entrenado. Esta información recogida será utilizada como input del algoritmo desarrollado para calcular el siguiente frame del video resultado.
 	
-	\item Desarrollar un algoritmo sencillo que permitirá al programa tomar decisiones sobre a donde se debe enfocar el siguiente frame. Este algoritmo tendrá en cuenta la posición del portero, la distancia estimada, el angúlo del frame anterior para prevenir el efecto de flickering y la posición de la pelota entre otros factores.
+	\item Categorizar los objetos detectados en cada una de las 6 perspectivas usando un modelo de detección de clases previamente entrenado. Esta información recogida será utilizada como input del algoritmo desarrollado para calcular el siguiente frame del vídeo resultado.
+	
+	\item Desarrollar un algoritmo sencillo que permitirá al programa tomar decisiones sobre a dónde se debe enfocar el siguiente frame. Este algoritmo tendrá en cuenta la posición del portero, la distancia estimada, el ángulo del frame anterior para prevenir el efecto de flickering y la posición de la pelota entre otros factores.
 	  
 \end{enumerate}
 
-Ademas de todo esto, se tratará de hacer el algoritmo lo más eficiente posible, haciendo uso de la paralelización de hilos y una unidad de procesamiento gráfica en caso de que este disponible en el ordenador en el que se ejecute el programa.
+Además de todo esto, se tratará de hacer el algoritmo lo más eficiente posible, haciendo uso de la paralelización de hilos y una unidad de procesamiento gráfico en caso de que esté disponible en el ordenador en el que se ejecute el programa.
 
 Estos objetivos buscan realizar una primera aproximación a resolver el problema y no pretenden dar una solución igual de precisa que la edición manual. Más adelante se detallará el trabajo futuro que podría realizarse para obtener resultados que se acerquen más a la calidad de un trabajo hecho a mano.
 
@@ -41,10 +39,10 @@ Estos objetivos buscan realizar una primera aproximación a resolver el problema
 Este documento se estructura de la siguiente forma:
 
 \begin{description}
-	\item [Capítulo 1: Introducción] Se hace una presentación inicial del proyecto, justificando la razón y motivación del desarrollo. Se definen de forma clara los objetivos y el alcance del proyecto y se muestra la estructura que seguirá el documento explicando brevemente cada cápitulo.
-	\item [Capítulo 2: Estado del Arte] Se realiza un estudio sobre el estado actual de la detección de imagenes usando modelos de visión computacional. También se realiza un trabajo de investigación sobre los diversos modelos disponibles y si estos han sido previamente aplicados a la detección de objetos en el ambito deportivo.
-	\item [Capítulo 3: Diseño] Se detalla brevemente el diseño del sistema de forma conceptual y se justifica que tecnologías han sido escogidas.
-	\item [Capítulo 4: Implementación] Se expone de forma muy detallada el proceso de la implementación de los distintos componentes del sistema asi como las dificultades encontradas y las diversas utilidades desarrolladas que han servido de apoyo para llegar a la conclusión.
-	\item [Capítulo 5: Resultados] Se presentan los resultados obtenidos en una serie de casos de prueba grabados para comprobar el funcionamiento del algoritmo
-	\item [Capítulo 6: Conclusiones y Trabajo Futuro] Se realiza una reflexión sobre el trabajo realizado, la correctitud de las decisiones que se han tomado y el trabajo futuro que se puede realizar para obtener mejores resultados
+	\item [Capítulo 1: Introducción] Se hace una presentación inicial del proyecto, justificando la razón y motivación del desarrollo. Se definen de forma clara los objetivos y el alcance del proyecto y se muestra la estructura que seguirá el documento explicando brevemente cada capítulo.
+	\item [Capítulo 2: Estado del Arte] Se realiza un estudio sobre el estado actual de la detección de imágenes usando modelos de visión computacional. También se realiza un trabajo de investigación sobre los diversos modelos disponibles y si estos han sido previamente aplicados a la detección de objetos en el ámbito deportivo.
+	\item [Capítulo 3: Diseño] Se detalla brevemente el diseño del sistema de forma conceptual y se justifica qué tecnologías han sido escogidas.
+	\item [Capítulo 4: Implementación] Se expone de forma detallada el proceso de la implementación de los distintos componentes del sistema así como las dificultades encontradas y las diversas utilidades desarrolladas que han servido de apoyo para llegar a la conclusión.
+	\item [Capítulo 5: Resultados] Se presentan los resultados obtenidos en una serie de casos de prueba grabados para comprobar el funcionamiento del algoritmo.
+	\item [Capítulo 6: Conclusiones y Trabajo Futuro] Se realiza una reflexión sobre el trabajo realizado, la corrección de las decisiones que se han tomado y el trabajo futuro que se puede realizar para obtener mejores resultados.
 \end{description}
