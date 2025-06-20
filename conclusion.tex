@@ -1,0 +1,29 @@
+En este último cápitulo se narran las conclusiones obtenidas tras la realización del trabajo. Además, se sugieren una serie de optimizaciones y desarrollos futuros para mejorar los resultados obtenidos.
+
+\section{Conclusiones y reflexiones}
+A lo largo del diseño y desarrollo del trabajo, se ha demostrado que automatizar los procesos de obtención de vídeos relevantes para porteros recreacionales es posible sin necesidad de una grán inversión de tiempo y dinero. Aunque los resultados obtenidos no llegan a ser de la calidad de una edición manual, si son suficientes para mostrar la mayor parte de la información de cada tipo de jugada relevante.
+
+En cuanto a la retrospectiva de las decisiones tomadas, haber cogido una cámara de 360 grados ha introducido mucha complejidad en el algoritmo pero ha resultado en mayor conveniencia a la hora de grabar el contenido frente a otras configuraciones. El modelo escogido para la detección de imágenes fue el correcto pues la conveniencia de us o y los resultados obtenidos usando el modelo más pequeño de YOLOv8 son más que suficientes para el proposito de este trabajo.
+
+\section{Trabajo futuro}
+Aunque los resultados obtenidos pueden ser suficiente para la mayor parte de casos de uso, hay muchas formas en las que estos pueden ser mejorados. A continuación se entrará en detalle en las principales mejoras propuestas una vez finalizado el desarrollo del TFG.
+
+\subsection{Uso de canales de audio para recortes automáticos}
+La primera mejora y quizás la más evidente es el uso de otras fuentes de información para determinar momentos clave del partido. La razón principal por la que no se ha abordado esto en el trabajo ha sido por la falta de vídeos de 360 grados grabando partidos enteros, así como la complejidad computacional introducida por vídeos tan largos y las limitaciones de un trabajo de esta naturaleza.
+
+Sin embargo, combinando esto con el algoritmo propuesto se puede llegar a un sistema de edición prácticamente desatendido donde el deportista se limita a importar el vídeo en el sistema y obtiene los resultados.
+
+\subsection{Desarrollo de una interfaz gráfica}
+Otra mejora muy adecuada para este proyecto sería el desarrollo de una interfaz gráfica que permita importar y exportar vídeos así como ver los clips extraidos por el algoritmo. De esta forma, el requisito actual de que el deportista maneje una terminal de linux desaparece completamente y su uso se facilitaría a personas sin conocimientos técnicos.
+
+La recomendación principal sería usar electron, el cual permite desarrollar aplicaciones de escritorio compatibles con todos los principales sistemas operativos por defecto. La interfaz gráfica podría ser implementada en React o Vue para mejorar la interactividad de la aplicación. También habría que implementar en node una interfaz de IPC que devuelva en tiempo real el progreso del algoritmo para asegurar que el usuario sabe lo que esta pasando en todo momento.
+
+\subsection{Uso de SORT deep learning}
+Una de las mejoras más significativas que se podría implementar en el sistema sería la incorporación de algoritmos de seguimiento de objetos más sofisticados, específicamente DeepSORT o sus variantes más recientes como ByteTrack o StrongSORT. Actualmente, el algoritmo se basa únicamente en la detección frame a frame, lo que puede generar inconsistencias en la identificación de jugadores y la pelota a lo largo de las secuencias de vídeo.
+La implementación de DeepSORT permitiría mantener la identidad de cada jugador detectado a través de múltiples frames, utilizando tanto características de movimiento como de apariencia visual. Esto resultaría en una mejora considerable en la precisión del seguimiento, especialmente en situaciones donde los jugadores se superponen o salen temporalmente del campo de visión de la cámara.
+Para el caso específico de las imágenes equirectangulares utilizadas en este trabajo, sería necesario adaptar el algoritmo de tracking para manejar las distorsiones características de este tipo de proyección. Esto incluiría la implementación de métricas de distancia esféricas en lugar de euclidianas para el seguimiento de movimiento, así como el manejo especial de las transiciones en los bordes de la imagen donde los objetos pueden desaparecer por un lado y reaparecer por el opuesto.
+
+\subsection{Entrenamiento de YOLO con un dataset customizado}
+Sin lugar a dudas, otra de las mejoras más importantes a estudiar sería la creación de un dataset curado de forma manual con la que entrenar la red neuronal de YOLO. El proceso es simple pero tedioso pues se require de hacer etiquetado de datos a mano además de reunir una cantidad de vídeos lo suficiente significativa como para que el dataset sea lo suficientemente grande pues la selección de frames a incluir debe de seguir un espaciado adecuado.
+
+Este proceso se puede acometer usando un programa como labelImg \cite{labelimg2024} el cual produce los datos etiquetados en un formato que los modelos de YOLO ya entienden.

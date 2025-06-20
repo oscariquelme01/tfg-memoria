@@ -84,7 +84,6 @@ $$R_{\text{yaw}}(\phi) = \begin{pmatrix}
 -\sin(\phi) & 0 & \cos(\phi)
 \end{pmatrix}$$
 
-\\
 Rotación de yaw (rotación alrededor del eje X):
 
 $$R_{\text{pitch}}(\theta) = \begin{pmatrix}
@@ -103,12 +102,11 @@ $\mathbf{d}_{\text{rot}} = R \cdot \mathbf{d}_{\text{norm}}$
 El vector de dirección 3D rotado $(x', y', z')$ se convierte a coordenadas esféricas, calculando la longitud (ángulo azimutal) y la latitud (ángulo polar):
 
 
-$$
 \begin{align}
 \phi &= \arctan2(x', z')\\
 \lambda &= \arcsin(y')
 \end{align}
-$$
+
 Donde $\phi \in [-\pi, \pi]$ y $\lambda \in [-\pi/2, \pi/2]$
 
 Finalmente, las coordenadas esféricas se mapean a coordenadas de píxel en la imagen equirectangular de dimensiones $(W_{\text{equi}}, H_{\text{equi}})$:

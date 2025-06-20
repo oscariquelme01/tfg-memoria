@@ -1,0 +1,27 @@
+En este cápitulo se detallan brevemente los resultados obtenidos, extrayendo frames de los distintos vídeos producidos por el algoritmo y reconociendo las limitaciones y los casos donde el algoritmo no ofrece buenos resultados.
+
+\section{Resultados obtenidos}
+El algoritmo producido ha sido capaz de seguir al portero en la mayor parte de casos sencillos donde el portero realiza una intervención clara en la jugada. A continuación, se muestran dos de los casos mas comúmens de intervenciones críticas de un portero y como el algoritmo ha resuelto la perspectiva adecuada a mostrar
+
+\subsection{Tiro}
+En primer lugar, se muestra un frame de una acción de un tiro. Este caso es ideal pues el algoritmo tiene un sesgo que favorece la distancia y en este tipo de acciones el portero siempre va a estar más cerca de la cámara que el atacante. En las figuras \ref{shot1} y \ref{shot2} se muestra el resultado producido por el algoritmo y la imagen equirectangular de la que partió.
+
+\begin{figure}[shot1]{shot1}{Imagen extraida de un tiro al portero producida por el algoritmo}
+	\image{200}{}{assets/frame-200-tiro-4-edited}
+\end{figure}
+
+\begin{figure}[shot2]{shot2}{Proyección equirectangular de la imagen del tiro desde la que partió el algoritmo}
+	\image{}{200}{assets/frame-200-tiro-4-equirect}
+\end{figure}
+
+\subsection{Mano a mano}
+En segundo lugar, se ha probado a grabar una serie de manos a mano donde se sospecha que el algoritmo va a predecir peor el frame siguiente debido a que son situaciones donde el portero suele alejarse de la porteria mientras que el jugador suele acercarse. En las figuras \ref{oneonone1} y \ref{oneonone2} se muestra el resultado producido por el algoritmo y la vista de cubemap que uso para identificar a las distintas personas que aparecián.
+
+
+\begin{figure}[oneonone1]{oneonone1}{Imagen extraida de un tiro al portero producida por el algoritmo}
+	\image{200}{}{assets/frame-380-mano-a-mano-edited}
+\end{figure}
+
+\begin{figure}[oneonone2]{oneonone2}{Proyección equirectangular de la imagen del tiro desde la que partió el algoritmo}
+	\image{}{300}{assets/frame-380-mano-a-mano-perspective}
+\end{figure}
