@@ -4,7 +4,7 @@ Dado que el problema a resolver en este trabajo es complejo, es necesario hacer 
 Hoy en día existe una amplia gama de dispositivos de grabación con distintas capacidades que sirven distintos propósitos. En el caso de la grabación y automatización de imágenes deportivas, se contemplan los siguientes tipos en función de la lente usada y el tipo de imagen capturada.
 \begin{description}
 	\item [Cámaras estándar:] Este tipo de dispositivos cuentan con una sola lente rectilínea que no provoca ningún tipo de distorsión en las líneas rectas de la imagen. Son conocidas también como cámaras convencionales y suelen ofrecer un campo de visión limitado menor al del ojo humano.
-	\item [Cámaras de 360 grados:] Este tipo de cámaras suelen contar con dos lentes y son capaces de capturar toda una escena en una imagen esférica. La proyección de una imagen esférica se conoce como su transformación equirectangular. A continuación, se muestran dos imágenes mostrando la forma esférica y su correspondiente proyección equirectangular.
+	\item [Cámaras de 360 grados:] Este tipo de cámaras suelen contar con dos lentes y son capaces de capturar toda una escena en una imagen esférica. La proyección de una imagen esférica se conoce como su transformación equirectangular \cite{zhang2018omnidirectional}. A continuación, se muestran dos imágenes mostrando la forma esférica y su correspondiente proyección equirectangular.
 		\image{}{}{assets/equirect_spherical_sample}
 \end{description}
 
@@ -14,13 +14,13 @@ El objetivo de este trabajo no es desarrollar y entrenar una red neuronal para l
 Existen una gran variedad de modelos que cumplen este criterio. Entre estos, destacaremos los dos modelos siguientes que son considerados como el estado del arte en visión computacional.
 
 \begin{description}
-	\item[YOLO (You Only Look Once):] Desarrollado inicialmente por Joseph Redmon y posteriormente mantenido por la compañía Ultralytics, YOLO representa una familia de algoritmos de detección de objetos que han revolucionado el campo de la visión por computador. Los modelos YOLO suelen venir previamente entrenados con el dataset COCO (Common Objects in Context), que contiene más de 330,000 imágenes etiquetadas con 80 clases diferentes de objetos, ofreciendo resultados relativamente precisos a una velocidad excepcional que permite su uso en tiempo real.
+	\item[YOLO (You Only Look Once):] Desarrollado inicialmente por Joseph Redmon \cite{redmon2016you} y posteriormente mantenido por la compañía Ultralytics, YOLO representa una familia de algoritmos de detección de objetos que han revolucionado el campo de la visión por computador. Los modelos YOLO suelen venir previamente entrenados con el dataset COCO (Common Objects in Context) \cite{lin2014microsoft}, que contiene más de 330,000 imágenes etiquetadas con 80 clases diferentes de objetos, ofreciendo resultados relativamente precisos a una velocidad excepcional que permite su uso en tiempo real.
 	
 	Su funcionamiento se basa en dividir la imagen de entrada en una cuadrícula de $S \times S$ \textit{grids} (típicamente 7×7, 13×13 o 19×19 dependiendo de la versión) y realizar una única pasada por una red neuronal convolucional profunda, la cual ejecuta simultáneamente la detección, clasificación y localización de objetos. Cada celda de la cuadrícula es responsable de predecir un número fijo de \textit{bounding boxes} (normalmente 2 o 3) junto con sus correspondientes puntuaciones de confianza y probabilidades de clase.
 	
 	Las principales ventajas de YOLO incluyen su velocidad de procesamiento (hasta 45 FPS en hardware estándar), su capacidad para detectar objetos de forma holística considerando el contexto global de la imagen, y su robustez ante variaciones en el fondo. Entre sus limitaciones se encuentran dificultades para detectar objetos muy pequeños o grupos densos de objetos, así como una menor precisión en comparación con métodos de dos etapas como R-CNN. Las versiones más recientes (YOLOv8, YOLOv9, YOLOv10) han mejorado significativamente tanto en precisión como en eficiencia computacional.
 
-	\item[SSD (Single Shot Detector):] Desarrollado por Wei Liu et al. en 2016, SSD representa un enfoque híbrido que combina la velocidad de los detectores de una sola pasada con la precisión de los métodos multiescala. Los modelos SSD son similares a YOLO en cuanto a su funcionamiento básico, realizando detección y clasificación en una única pasada por la red neuronal, pero incorporan una diferencia arquitectónica fundamental que los distingue significativamente.
+	\item[SSD (Single Shot Detector):] Desarrollado por Wei Liu et al. en 2016 \cite{liu2016ssd}, SSD representa un enfoque híbrido que combina la velocidad de los detectores de una sola pasada con la precisión de los métodos multiescala. Los modelos SSD son similares a YOLO en cuanto a su funcionamiento básico, realizando detección y clasificación en una única pasada por la red neuronal, pero incorporan una diferencia arquitectónica fundamental que los distingue significativamente.
 	
 	La característica distintiva de SSD radica en su uso de mapas de características (\textit{feature maps}) de múltiples escalas extraídos de diferentes capas de la red neuronal convolucional. En lugar de realizar predicciones únicamente en la última capa como YOLO, SSD genera predicciones en varios niveles de resolución: capas tempranas con alta resolución espacial para detectar objetos pequeños, y capas profundas con baja resolución pero rica información semántica para objetos grandes. Típicamente utiliza 6 escalas diferentes con tamaños de \textit{grids} que van desde 38×38 hasta 1×1.
 	
@@ -35,10 +35,105 @@ El estado del arte en edición procedural de vídeos deportivos ha evolucionado 
 
 Por otro lado, existen casos de éxito en contextos más informales en los que ingenieros han logrado crear pipelines de automatización de edición de vídeo \cite{mediumVideoEditingPython} usando métodos parecidos al de Merler et al.
 
-En el contexto del fútbol, los avances en algoritmos de Deep Learning han revolucionado el monitoreo del rendimiento, donde la tecnología de visión computacional emerge como herramienta vital no invasiva para el análisis de rendimiento, ofreciendo oportunidades para mejorar la claridad, precisión e inteligencia en la observación de eventos deportivos. Específicamente para la perspectiva del portero, trabajos como el prototipo de portero inteligente \cite{prasetya2020} utilizando visión computacional demuestran la viabilidad de sistemas de seguimiento de color sincronizados con cálculos matemáticos para posicionamiento, aplicables al entrenamiento de futbolistas. Sin embargo, los casos de estudio que usan edición procedural aplicados al deportista recreacional son limitados, puesto que la mayoría de trabajos se aplican a los profesionales y la élite del deporte.
+En el contexto del fútbol, los avances en algoritmos de Deep Learning han revolucionado el monitoreo del rendimiento \cite{cioppa2020arthus}, cite{hassan2020computer}, donde la tecnología de visión computacional emerge como herramienta vital no invasiva para el análisis de rendimiento, ofreciendo oportunidades para mejorar la claridad, precisión e inteligencia en la observación de eventos deportivos. Específicamente para la perspectiva del portero, trabajos como el prototipo de portero inteligente \cite{prasetya2020} utilizando visión computacional demuestran la viabilidad de sistemas de seguimiento de color sincronizados con cálculos matemáticos para posicionamiento, aplicables al entrenamiento de futbolistas. Sin embargo, los casos de estudio que usan edición procedural aplicados al deportista recreacional son limitados, puesto que la mayoría de trabajos se aplican a los profesionales y la élite del deporte.
+
+\subsection{Conceptos y transformaciones sobre las distintas vistas}
+La proyección de una imagen esférica sobre una superficie plana se conoce como su imágen equirectangular. El trabajo con imágenes esféricas y equirectangulares introduce una serie de dificultades frente al de imagenes planas. Antes de detallar la implementación, hace falta explicar una serie de conceptos asociados a las coordenadas de imágenes esféricas, equirectangulares y cartesianas y la conversión entre las mismas. En la figura \ref{equirectCoordsSpherical} se aprecia una representación semántica de las coordenadas equirectangulares en una imagen omnidireccional. Las coordenadas que indexan una imágen equirectangular vienen dadas por las letras $(\theta, \phi)$.
+
+\begin{figure}[Representación de sistemas de coordenadas en una esfera]{equirectCoordsSpherical}{Representación de coordenadas equirectangulares en una figura esférica}
+	\begin{center}
+		\image{180px}{}{assets/omnidirectionalImage}
+	\end{center}
+\end{figure}
+
+\begin{description}
+	\item[$\theta$] Indexa el eje horizontal y toma valores entre $[-\pi, \pi]$ (360 grados). Puede pensarse como la dirección horizontal en la que está mirando la cámara. Viene dado en radianes y en caso de estar dado en grados se conoce como \textit{yaw}
+	\item[$\phi$] Indexa el eje vertical y toma valores entre $[-\frac{\pi}{2}, \frac{\pi}{2}]$ (180 grados). Puede pensarse como de arriba o abajo esta apuntando la cámara. Viene dado en radianes y en caso de estar dado en grados se como como \textit{pitch}
+\end{description}
+
+Una vez proyectada la imágen esférica sobre una superficie plana se obtiene una imagen como la mostrada en la figura \ref{equirectCoordsPlain}, donde se ve claramente la forma en la que se indexa a través de $\theta, \phi$ (o yaw y pitch en grados) la imagen.
+
+
+\begin{figure}[Representación de coordenadas equirectangulares]{equirectCoordsPlain}{Representación de coordenadas equirectangulares en una superficie plana}
+	\begin{center}
+		\image{300px}{}{assets/equirectCoordinates}
+	\end{center}
+\end{figure}
+
+De esta forma, resulta muy sencillo conceptualmente 'desplegar' la proyección equirectangular en una vista conocida como CubeMap, la cual representa las 6 vistas principales posibles en un espacio tridimensional. Se puede pensar como envolver la vista esférica en un cubo donde cada cara tendrá una perspectiva plana sin información duplicada del resto. La figura \ref{cubemapConcept} muestra una representación gráfica de este concepto.
+
+\begin{figure}[Representación visual de cubemap]{cubemapConcept}{Representación visual de la vista Cubemap a partir de una imagen esférica}
+	\begin{center}
+		\image{300px}{}{assets/cubemapConcept}
+	\end{center}
+\end{figure}
+
+\subsection{Transformación de imágenes equirectangulares a planas}
+Como ya se ha discutido previamente, el modelo de visión computacional empleado está entrenado con imágenes sin distorsión por lo que ofrecerá mejores resultados si las imagenes procesadas son perspectivas generadas a partir de la imagen equirectangular.
+
+Para crear una imagen sin distorsión a partir de una imagen equirectangular, se requiere de una coordenada que indexe el punto central de la perspectiva y el tamaño del resultado deseado. 
+El proceso de transformación de imágenes es costoso y complejo, y su fundamento matemático se encuentra en la trigonometría avanzada y las transformaciones matriciales.
+
+Dada una imagen de salida en perspectiva de resolución $(W, H)$ y campo de visión $\text{FOV}$, primero establecemos un sistema de coordenadas de imagen normalizado:
+$x = \frac{2u}{W-1} - 1, \quad y = \frac{2v}{H-1} - 1$
+donde $(u, v)$ son coordenadas de píxel con $u \in [0, W-1]$ y $v \in [0, H-1]$.
+La proyección en perspectiva mapea estas coordenadas 2D a rayos 3D sobre la esfera unitaria. La distancia focal en coordenadas normalizadas es:
+$z = \frac{1}{\tan(\text{FOV}/2)}$.
+Cada píxel $(x, y)$ corresponde a un vector de dirección 3D:
+$\mathbf{d} = (x, y, z)$
+Este vector se normaliza para situarse en la esfera unitaria:
+$\mathbf{d}_{\text{norm}} = \frac{\mathbf{d}}{||\mathbf{d}||} = \frac{(x, y, z)}{\sqrt{x^2 + y^2 + z^2}}$
+
+La dirección de visualización se controla mediante rotaciones de pitch ($\phi$) y yaw ($\theta$). Estas se aplican usando matrices de rotación 3D:
+
+Rotación de pitch (rotación alrededor del eje Y):
+
+$$R_{\text{yaw}}(\phi) = \begin{pmatrix}
+\cos(\phi) & 0 & \sin(\phi) \\
+0 & 1 & 0 \\
+-\sin(\phi) & 0 & \cos(\phi)
+\end{pmatrix}$$
+
+Rotación de yaw (rotación alrededor del eje X):
+
+$$R_{\text{pitch}}(\theta) = \begin{pmatrix}
+1 & 0 & 0 \\
+0 & \cos(\theta) & -\sin(\theta) \\
+0 & \sin(\theta) & \cos(\theta)
+\end{pmatrix}$$
+
+La matriz de rotación combinada es:
+$R = R_{\text{yaw}}(\phi) \cdot R_{\text{pitch}}(\theta)$
+
+Por lo tanto, el vector de dirección rotado se convierte en:
+$\mathbf{d}_{\text{rot}} = R \cdot \mathbf{d}_{\text{norm}}$
+
+
+El vector de dirección 3D rotado $(x', y', z')$ se convierte a coordenadas esféricas, calculando la longitud (ángulo azimutal) y la latitud (ángulo polar):
+
+
+\begin{align}
+\phi &= \arctan2(x', z')\\
+\lambda &= \arcsin(y')
+\end{align}
+
+Donde $\phi \in [-\pi, \pi]$ y $\lambda \in [-\pi/2, \pi/2]$
+
+Finalmente, las coordenadas esféricas se mapean a coordenadas de píxel en la imagen equirectangular de dimensiones $(W_{\text{equi}}, H_{\text{equi}})$:
+
+Coordenada horizontal:
+$u_{\text{equi}} = \left(\frac{\phi}{\pi} + 1\right) \cdot \frac{W_{\text{equi}}}{2}$
+
+Coordenada vertical:
+$v_{\text{equi}} = \left(\frac{1}{2} - \frac{\lambda}{\pi}\right) \cdot H_{\text{equi}}$
+
+La transformación completa puede expresarse como la composición:
+$\text{Perspectiva}(u,v) \rightarrow \text{Normalizada}(x,y,z) \rightarrow \text{Esfera}(x',y',z') \rightarrow \text{Esférica}(\phi,\lambda) \rightarrow \text{Equirectangular}(u_{\text{equi}},v_{\text{equi}})$
+
+
 
 \section[Conclusiones]{Conclusiones del estado del arte}
 
 El análisis del estado del arte ha permitido identificar los principales avances y herramientas aplicables a la automatización de la edición de vídeo deportivo y tomar una decisión informada previa al diseño sobre qué tecnologías se usarán. Se ha observado que el uso de cámaras de 360 grados ofrece una solución eficaz para capturar la totalidad del entorno sin necesidad de múltiples dispositivos, lo cual resulta ideal para el jugador de fútbol recreacional que tiene un campo muy amplio que capturar. También se ha observado que, a pesar de que existen varios modelos de detección de imágenes usando visión computacional que resultarían viables de usar, el modelo de YOLO se ajusta mejor a las necesidades del proyecto.
 
-A pesar de estos avances, la mayoría de las soluciones existentes están orientadas a contextos profesionales o de élite, con escasa atención al deportista recreacional. Además, los enfoques de edición procedural suelen depender de infraestructura compleja o datasets personalizados no siempre accesibles. Frente a estas limitaciones, este trabajo propone una solución que integra tecnologías accesibles y eficientes para ofrecer un sistema automático de edición de momentos relevantes desde el punto de vista del portero, contribuyendo así a estrechar la brecha entre el uso recreativo y profesional de la visión por computador aplicada al deporte.
+A pesar de estos avances \cite{xiong2019less}, la mayoría de las soluciones existentes están orientadas a contextos profesionales o de élite, con escasa atención al deportista recreacional. Además, los enfoques de edición procedural suelen depender de infraestructura compleja o datasets personalizados no siempre accesibles. Frente a estas limitaciones, este trabajo propone una solución que integra tecnologías accesibles y eficientes para ofrecer un sistema automático de edición de momentos relevantes desde el punto de vista del portero, contribuyendo así a estrechar la brecha entre el uso recreativo y profesional de la visión por computador aplicada al deporte.

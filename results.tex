@@ -6,22 +6,33 @@ El algoritmo producido ha sido capaz de seguir al portero en la mayor parte de c
 \subsection{Tiro}
 En primer lugar, se muestra un frame de una acción de un tiro. Este caso es ideal pues el algoritmo tiene un sesgo que favorece la distancia y en este tipo de acciones el portero siempre va a estar más cerca de la cámara que el atacante. En las figuras \ref{shot1} y \ref{shot2} se muestra el resultado producido por el algoritmo y la imagen equirectangular de la que partió.
 
-\begin{figure}[shot1]{shot1}{Imagen extraida de un tiro al portero producida por el algoritmo}
-	\image{200}{}{assets/frame-200-tiro-4-edited}
+\begin{figure}[Imagen de tiro producida por el algoritmo]{shot1}{Imagen extraida de un tiro al portero producida por el algoritmo}
+	\image{200px}{}{assets/frame-200-tiro-4-edited}
 \end{figure}
 
-\begin{figure}[shot2]{shot2}{Proyección equirectangular de la imagen del tiro desde la que partió el algoritmo}
-	\image{}{200}{assets/frame-200-tiro-4-equirect}
+\begin{figure}[Proyección equirectangular de la imagen de un tiro]{shot2}{Proyección equirectangular de la imagen del tiro desde la que partió el algoritmo}
+	\image{}{200px}{assets/frame-200-tiro-4-equirect}
 \end{figure}
 
 \subsection{Mano a mano}
-En segundo lugar, se ha probado a grabar una serie de manos a mano donde se sospecha que el algoritmo va a predecir peor el frame siguiente debido a que son situaciones donde el portero suele alejarse de la porteria mientras que el jugador suele acercarse. En las figuras \ref{oneonone1} y \ref{oneonone2} se muestra el resultado producido por el algoritmo y la vista de cubemap que uso para identificar a las distintas personas que aparecián.
+En segundo lugar, se ha probado a grabar una serie de manos a mano donde se sospecha que el algoritmo va a predecir peor el frame siguiente debido a que son situaciones donde el portero suele alejarse de la porteria mientras que el jugador suele acercarse. En las figuras \ref{manoAManoPerspectiva} y \ref{manoAManoCubemap} se muestra el resultado producido por el algoritmo y la vista de cubemap que uso para identificar a las distintas personas que aparecián.
 
 
-\begin{figure}[oneonone1]{oneonone1}{Imagen extraida de un tiro al portero producida por el algoritmo}
-	\image{200}{}{assets/frame-380-mano-a-mano-edited}
+\begin{figure}[Imagen de mano a mano producida por el algoritmo]{manoAManoPerspectiva}{Imagen extraida de un tiro al portero producida por el algoritmo}
+	\image{200px}{}{assets/frame-380-mano-a-mano-edited}
 \end{figure}
 
-\begin{figure}[oneonone2]{oneonone2}{Proyección equirectangular de la imagen del tiro desde la que partió el algoritmo}
-	\image{}{300}{assets/frame-380-mano-a-mano-perspective}
+\begin{figure}[Proyección de la imagen mano a mano en vista cubemap]{manoAManoCubemap}{Proyección cubemap de la imagen del tiro desde la que partió el algoritmo}
+	\image{}{300px}{assets/frame-380-mano-a-mano-perspective}
 \end{figure}
+
+\section{Limitaciones}
+Si bien es cierto que el algoritmo ha ofrecido resultados decentes, debido al sesgo elegido por distancia, existen una serie de casos donde el algoritmo comete errores en su predicción de mejor ángulo para la nueva vista.
+
+Esto ocurre principalmente en dos escenarios.
+
+El primer escenario ocurre cuando muchos jugadores se acercan a la porteria, por ejemplo en un corner. Al estar muy juntos, son capaces de pasar las limitaciones de saltos impuesta por el algoritmo y al haber tantos jugadores cerca de la porteria, el algoritmo comete errores al detectar al portero. Los resultados no son invalidantes pero si se aprecia como el vídeo enfoca a otros jugadores y no al portero.
+
+El segundo caso ocurre cuando el portero y la pelota están en vistas opuestas, es decir, izquierda y derecha o frontal y trasera. Esto hace que la interpolación de resultados no deseados. Sin embargo, esto no suele pasar a menudo, solo cuando la jugada ha terminado por lo que no se ha considerado realizar una corrección manual.
+
+
