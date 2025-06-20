@@ -4,9 +4,15 @@ Dado que el problema a resolver en este trabajo es complejo, es necesario hacer 
 Hoy en día existe una amplia gama de dispositivos de grabación con distintas capacidades que sirven distintos propósitos. En el caso de la grabación y automatización de imágenes deportivas, se contemplan los siguientes tipos en función de la lente usada y el tipo de imagen capturada.
 \begin{description}
 	\item [Cámaras estándar:] Este tipo de dispositivos cuentan con una sola lente rectilínea que no provoca ningún tipo de distorsión en las líneas rectas de la imagen. Son conocidas también como cámaras convencionales y suelen ofrecer un campo de visión limitado menor al del ojo humano.
-	\item [Cámaras de 360 grados:] Este tipo de cámaras suelen contar con dos lentes y son capaces de capturar toda una escena en una imagen esférica. La proyección de una imagen esférica se conoce como su transformación equirectangular \cite{zhang2018omnidirectional}. A continuación, se muestran dos imágenes mostrando la forma esférica y su correspondiente proyección equirectangular.
-		\image{}{}{assets/equirect_spherical_sample}
+	\item [Cámaras de 360 grados:] Este tipo de cámaras suelen contar con dos lentes y son capaces de capturar toda una escena en una imagen esférica. La proyección de una imagen esférica se conoce como su transformación equirectangular \cite{zhang2018omnidirectional}. En la figura \ref{equirectSpherical} se muestran dos imágenes mostrando la forma esférica y su correspondiente proyección equirectangular.
 \end{description}
+
+
+\begin{figure}[Vista esférica y equirectangular]{equirectSpherical}{Vista esférica y equirectangular de una camara de 360 grados\cite{taxonomy_360_videos}}
+	\begin{center}
+		\image{}{}{assets/equirect_spherical_sample}
+	\end{center}
+\end{figure}
 
 \section[Detección de objetos]{Modelos de detección de objetos}
 El objetivo de este trabajo no es desarrollar y entrenar una red neuronal para la detección de imágenes haciendo \textit{fine-tuning} para el caso de estudio, pues esto requiere de una labor de etiquetado de imágenes y una creación de un dataset pulido con distintas imágenes de porteros en distintas posiciones, además de los correspondientes recursos computacionales. Por lo tanto, se debe escoger un modelo previamente entrenado con un dataset lo suficientemente grande que ofrezca precisión para la detección de personas y balones de fútbol.
@@ -40,7 +46,7 @@ En el contexto del fútbol, los avances en algoritmos de Deep Learning han revol
 \subsection{Conceptos y transformaciones sobre las distintas vistas}
 La proyección de una imagen esférica sobre una superficie plana se conoce como su imágen equirectangular. El trabajo con imágenes esféricas y equirectangulares introduce una serie de dificultades frente al de imagenes planas. Antes de detallar la implementación, hace falta explicar una serie de conceptos asociados a las coordenadas de imágenes esféricas, equirectangulares y cartesianas y la conversión entre las mismas. En la figura \ref{equirectCoordsSpherical} se aprecia una representación semántica de las coordenadas equirectangulares en una imagen omnidireccional. Las coordenadas que indexan una imágen equirectangular vienen dadas por las letras $(\theta, \phi)$.
 
-\begin{figure}[Representación de sistemas de coordenadas en una esfera]{equirectCoordsSpherical}{Representación de coordenadas equirectangulares en una figura esférica}
+\begin{figure}[Representación de sistemas de coordenadas en una esfera]{equirectCoordsSpherical}{Representación de coordenadas equirectangulares en una figura esférica \cite{Bussjaeger2025}}
 	\begin{center}
 		\image{180px}{}{assets/omnidirectionalImage}
 	\end{center}
@@ -62,7 +68,7 @@ Una vez proyectada la imágen esférica sobre una superficie plana se obtiene un
 
 De esta forma, resulta muy sencillo conceptualmente 'desplegar' la proyección equirectangular en una vista conocida como CubeMap, la cual representa las 6 vistas principales posibles en un espacio tridimensional. Se puede pensar como envolver la vista esférica en un cubo donde cada cara tendrá una perspectiva plana sin información duplicada del resto. La figura \ref{cubemapConcept} muestra una representación gráfica de este concepto.
 
-\begin{figure}[Representación visual de cubemap]{cubemapConcept}{Representación visual de la vista Cubemap a partir de una imagen esférica}
+\begin{figure}[Representación visual de cubemap]{cubemapConcept}{Representación visual de la vista Cubemap a partir de una imagen esférica \cite{ramirez2014cubemaps}}
 	\begin{center}
 		\image{300px}{}{assets/cubemapConcept}
 	\end{center}

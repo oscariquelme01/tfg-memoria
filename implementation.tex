@@ -6,7 +6,7 @@ En primer lugar, se debe implementar el programa que convertirá los videos del 
 
 Antes de desarrollar, se debe de tener acceso al SDK de insta360, al cual se aplica con razones acádemicas en este caso. El proceso de aprobación se extendió una semana y una vez obtenido, la implementación del conversor de videos fue muy sencilla pues el ejemplo de uso propuesto por la compañia es muy similar a la funcionalidad requerida para el proyecto. No se puede entrar muy en detalle de la implementación pues la mayor parte del trabajo la realiza la clase \verb|VideoStitcher| del SDK privado de insta360. Sin embargo, cabe mencionar que el programa viene con soporte de optimizaciones de GPU y paralelización de hilos.
 
-El único desarrollo destacable es el proceso de elección de videos dínamico por el usuario pues a traves de una aplicación de CLI puesto que al tener dos lentes y un video asociado a cada lente, es poco práctico tener que escribir manualmente los \textit{paths} de entrada y salida del programa. A través del uso de Regex.
+El único desarrollo destacable es el proceso de elección de videos dínamico por el usuario pues a traves de una aplicación de CLI puesto que al tener dos lentes y un vídeo asociado a cada lente, es poco práctico tener que escribir manualmente los \textit{paths} de entrada y salida del programa. A través del uso de Regex.
 
 \CPPCode[picking_files_cpp]{File picking}{Automatización de I/O según la convención de insta360}{main.cc}{52}{86}{}
 
@@ -14,7 +14,7 @@ El único desarrollo destacable es el proceso de elección de videos dínamico p
 
 \section{Rastreador del portero (goalkeeper\_tracker)}
 
-Una vez obtenido el video en un formato con el que se puede trabajar con la librería de openCV, se procede a la implementación del principal objetivo del trabajo, la automatización de edición de jugadas de portero de futbol.
+Una vez obtenido el vídeo en un formato con el que se puede trabajar con la librería de openCV, se procede a la implementación del principal objetivo del trabajo, la automatización de edición de jugadas de portero de futbol.
 
 Los pasos a seguir por el programa, independientemente de su implementación son los siguientes.
 \begin{enumerate}
@@ -52,7 +52,7 @@ Se puede intuir que este proceso es muy costoso por lo que una optimización evi
 
 En el extracto de código \ref{precomputeMappingTables} se muestra la implementación del precomputo de las tables de mapeo usando el algoritmo descrito en el apartado anterior.
 
-\PythonCode[precomputeMappingTables]{precomputeMappingTables}{Precomputación de tablas para un mapeo mas eficiente de las vistas de CubeMap}{EquirectProcessor.py}{29}{71}{}
+\PythonCode[precomputeMappingTables]{precomputeMappingTables}{Precomputación de tablas para un mapeo más eficiente de las vistas de CubeMap}{EquirectProcessor.py}{29}{71}{}
 
 \subsection{Detección de imágenes usando YOLO}
 Una vez calculadas todas las perspectivas, se procede a la detección de imágenes usando el modelo de YOLO v8. Ultralytics ofrece una serie de tamaños dentro de cada versión de YOLO. Por limitaciones computacionales, se ha elegido el tamaño nano, el cual ofrece los peores resultados a cambio de los mejores tiempos. Esta es una decisión adecuada pues el trabajo esta orientada al deportista recreacional que no dispone de computación de altas prestaciones.
@@ -78,14 +78,14 @@ Luego, se calcula el yaw y pitch base que apuntan directamente al portero. Estos
 
 \PythonCode[Algorithm]{Algorithm}{Detección ingénua del portero en base a los resultados de YOLO}{Algorithm.py}{0}{35}{}
 
-Con estos pasos realizados, se tiene ya una buena aproximación del frame que se debe generar para mostrar en el video final la jugada. Sin embargo, no se tiene en cuenta el posible efecto flickering causado por un falso positivo de un jugador que no sea el portero acercandose a la cámara ni se tiene en cuenta la posición del balón para mostrar, por ejemplo, el inicio de un tiro.
+Con estos pasos realizados, se tiene ya una buena aproximación del frame que se debe generar para mostrar en el vídeo final la jugada. Sin embargo, no se tiene en cuenta el posible efecto flickering causado por un falso positivo de un jugador que no sea el portero acercandose a la cámara ni se tiene en cuenta la posición del balón para mostrar, por ejemplo, el inicio de un tiro.
 
 Por lo tanto, el siguiente paso será incorporar la información del balón recogida en la fase de detección si es que está disponible y realizar un sesgo del ángulo en favor del balón. Se ha decidido aplicar un sistema de pesos en función de la distancia del balón con condiciones que modifican de forma dínamica el peso de las coordenadas de la pelota.
 
 
 \PythonCode[Algorithm2]{Algorithm2}{Incorporación de la bola en el algoritmo de rastreo}{Algorithm.py}{37}{61}{}
 
-Finalmente, para resolver el problema del flickering previamente mencionado. Este problema se da en el caso de este trabajo cuando hay una diferencia considerable entre la predicción del algoritmo del frame $n$ y el frame previo $n-1$. El efecto resultante es una falta de cohesión en el video y en función del número de frames puede llegar a darse un parpadeo rápido que afecta gravemente a la calidad del video resultante. 
+Finalmente, para resolver el problema del flickering previamente mencionado. Este problema se da en el caso de este trabajo cuando hay una diferencia considerable entre la predicción del algoritmo del frame $n$ y el frame previo $n-1$. El efecto resultante es una falta de cohesión en el vídeo y en función del número de frames puede llegar a darse un parpadeo rápido que afecta gravemente a la calidad del video resultante. 
 
 Se ha decidido aplicar técnicas básicas de suavizado de vídeo para prevenir el flickering. Primero, el algoritmo se asegura de que el salto de un frame a otro no es mayor que el umbral definido por argumentos. Luego, el algoritmo aplica una media movil exponencial (EMA) para suavizar el yaw y pitch previamente limitados.
 
